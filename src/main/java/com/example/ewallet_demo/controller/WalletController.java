@@ -17,7 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Wallet Controller", description = "Endpoints for wallet operations (Bearer token)")
 @RestController
 @RequestMapping("/api/wallet")
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class WalletController {
     private final WalletService walletService;
     private final TransactionRepository transactionRepository;
 
+    @Operation(summary = "Get my wallet")
     @GetMapping("/me")
     public ResponseEntity<?> getMyWallet(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
@@ -63,6 +67,7 @@ public class WalletController {
 //        }
 //    }
 
+    @Operation(summary = "Top up wallet")
     @PostMapping("/topup")
     public ResponseEntity<?> topUp(
             @RequestHeader("Authorization") String authHeader,
@@ -74,6 +79,7 @@ public class WalletController {
         return ResponseEntity.ok(updatedWallet);
     }
 
+    @Operation(summary = "Transfer money to another user")
     @PostMapping("/transfer")
     public ResponseEntity<?> transfer(
             @RequestHeader("Authorization") String authHeader,
@@ -93,6 +99,7 @@ public class WalletController {
         }
     }
 
+    @Operation(summary = "Withdraw money from wallet")
     @PostMapping("/withdraw")
     public ResponseEntity<?> withdraw(
             @RequestHeader("Authorization") String authHeader,
@@ -110,6 +117,7 @@ public class WalletController {
         }
     }
 
+    @Operation(summary = "Get transaction history")
     @GetMapping("/transactions")
     public ResponseEntity<?> getTransactions(
             @RequestHeader("Authorization") String authHeader
@@ -120,6 +128,4 @@ public class WalletController {
         List<Transaction> tx = transactionRepository.findBySenderUsernameOrReceiverUsername(username, username);
         return ResponseEntity.ok(tx);
     }
-
-
 }
