@@ -25,26 +25,37 @@
 
 ###
 <h2 align="left">How to Run the Application</h2>
-Clone the repository
+1. Clone the repository
 <br>
 
 ```bash
 git clone https://github.com/JstnAngrendo/ewallet-api-demo.git
 cd ewallet-api-demo
 ```
-Build the Docker Image (Optional if using Docker Compose): If you want to manually build the Docker image:
+2. (Optional) Build the Docker Image Manually
+Usually not needed when using Docker Compose.
+
 ```bash
 docker build -t ewallet-demo .
 ```
-Run the Application: To start the container and expose port 8080, run:
+
+3. Run Application with Docker Compose
 ```bash
-docker run -p 8080:8080 ewallet-demo
-```
-or
-```
+docker-compose down -v   # Optional: Clean previous containers and volumes
 docker-compose up --build
 ```
-Access the Application: The application will now be available at http://localhost:8080 on your browser.<br>
-You can also access it with Postman or Swagger UI
 
+
+<h2 align="left">API Testing</h2>
+You can test the API with:
+<ul>
+  <li>Postman</li>
+  <li>Swagger UI at: </li>
+</ul>
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+Note for Swagger Authorization:
+When authorizing via Swagger, do not include the word Bearer. Just paste the token directly.
 
