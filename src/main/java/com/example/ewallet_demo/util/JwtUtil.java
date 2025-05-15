@@ -2,6 +2,9 @@ package com.example.ewallet_demo.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import java.util.function.Function;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
@@ -18,6 +21,25 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key)
                 .compact();
+    }
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (SignatureException e) {
+            throw new SecurityException("Invalid JWT signature");
+        } catch (MalformedJwtException e) {
+            throw new SecurityException("Invalid JWT token");
+        } catch (ExpiredJwtException e) {
+            throw new SecurityException("Expired JWT token");
+        } catch (UnsupportedJwtException e) {
+            throw new SecurityException("Unsupported JWT token");
+        } catch (IllegalArgumentException e) {
+            throw new SecurityException("JWT claims string is empty");
+        }
     }
 
     public Claims extractAllClaims(String token) {
