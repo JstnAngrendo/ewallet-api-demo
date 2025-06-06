@@ -1,6 +1,7 @@
 package com.example.ewallet_demo.controller;
 
 
+import com.example.ewallet_demo.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,9 @@ public class AdminController {
 
     @Operation(summary = "Get admin resource")
     @GetMapping
-    public ResponseEntity<String> getAdminResult() {
-        return ResponseEntity.ok("Access granted to admin resource.");
+    public ResponseEntity<ApiResponse<String>> getAdminResult() {
+        return ResponseEntity.ok(
+                ApiResponse.success("Admin resource accessed successfully", "Access granted to admin resource.")
+        );
     }
 }

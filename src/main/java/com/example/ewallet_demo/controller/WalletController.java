@@ -138,6 +138,6 @@ public class WalletController {
                 transaction -> transactionMapper.toResponse(transaction)
         );
 
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success("Transactions retrieved successfully", response));
     }
 }
