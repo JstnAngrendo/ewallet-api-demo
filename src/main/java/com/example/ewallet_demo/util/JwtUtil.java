@@ -16,11 +16,15 @@ public class JwtUtil {
     public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
-                .claim("role", "ROLE_" + role)
+                .claim("roles", "ROLE_" + role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key)
                 .compact();
+    }
+
+    public String extractRole(String token) {
+        return (String) extractAllClaims(token).get("roles");
     }
     public boolean validateToken(String token) {
         try {
@@ -42,6 +46,10 @@ public class JwtUtil {
         }
     }
 
+    public long getExpirationInSeconds() {
+        return EXPIRATION_TIME / 1000;
+    }
+
     public Claims extractAllClaims(String token) {
         try {
             return Jwts.parserBuilder()
@@ -60,9 +68,6 @@ public class JwtUtil {
         return extractAllClaims(token).getSubject();
     }
 
-    public String extractRole(String token) {
-        return (String) extractAllClaims(token).get("role");
-    }
 
     public boolean isTokenValid(String token, String username) {
         final String extractedUsername = extractUsername(token);
