@@ -1,6 +1,8 @@
 package com.example.ewallet_demo.controller;
 
+import com.example.ewallet_demo.dto.ApiResponse;
 import com.example.ewallet_demo.dto.UserRegisterRequest;
+import com.example.ewallet_demo.dto.UserResponse;
 import com.example.ewallet_demo.model.User;
 import com.example.ewallet_demo.service.UserService;
 import com.example.ewallet_demo.util.JwtUtil;
@@ -21,9 +23,11 @@ public class UserController {
 
     @Operation(summary = "Register a new user")
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@Valid @RequestBody UserRegisterRequest request) {
-        User newUser = userService.registerUser(request.getUsername(), request.getPassword(), request.getRole());
-        return ResponseEntity.ok(newUser);
+    public ResponseEntity<ApiResponse<UserResponse>> registerUser(@Valid @RequestBody UserRegisterRequest request) {
+        UserResponse response = userService.registerUser(request);
+        return ResponseEntity.ok(
+                ApiResponse.success("User registered successfully", response)
+        );
     }
 
 //    @PostMapping("/register")
