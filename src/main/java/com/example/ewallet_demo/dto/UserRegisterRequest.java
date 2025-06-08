@@ -1,6 +1,8 @@
 package com.example.ewallet_demo.dto;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 
+@Builder
 public class UserRegisterRequest {
     @NotBlank(message = "Username is required")
     private String username;

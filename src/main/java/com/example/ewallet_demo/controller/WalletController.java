@@ -45,21 +45,24 @@ public class WalletController {
 
     @Operation(summary = "Get my wallet")
     @GetMapping("/me")
-    public ResponseEntity<?> getMyWallet( ) {
+    public ResponseEntity<ApiResponse<?>> getMyWallet( ) {
 //        String token = authHeader.substring(7);
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> userOpt = userRepository.findByUsername(username);
 
         if (userOpt.isEmpty()) {
-            return ResponseEntity.status(404).body("User not found");
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.error("not_found", "User not found"));
         }
 
         Optional<Wallet> walletOpt = walletRepository.findByUser(userOpt.get());
         if (walletOpt.isEmpty()) {
-            return ResponseEntity.status(404).body("Wallet not found");
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.error("not_found", "Wallet not found"));
         }
 
-        return ResponseEntity.ok(walletOpt.get());
+        return ResponseEntity.ok(
+                ApiResponse.success("Wallet retrieved successfully", walletOpt.get()));
     }
 
 //    @PostMapping("/topup")
@@ -81,45 +84,62 @@ public class WalletController {
 
     @Operation(summary = "Top up wallet")
     @PostMapping("/topup")
-    public ResponseEntity<?> topUp(
+    public ResponseEntity<ApiResponse<?>> topUp(
             @Valid @RequestBody TopUpRequest request
     ) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Wallet updatedWallet = walletService.topUp(username, request.getAmount());
-        return ResponseEntity.ok(updatedWallet);
+        try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            Wallet updatedWallet = walletService.topUp(username, request.getAmount());
+            return ResponseEntity.ok(
+                    ApiResponse.success("Top up successful", updatedWallet)
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("bad_request", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.error("not_found", e.getMessage()));
+        }
     }
 
     @Operation(summary = "Transfer money to another user")
     @PostMapping("/transfer")
-    public ResponseEntity<?> transfer(
+    public ResponseEntity<ApiResponse<?>> transfer(
             @RequestParam String toUsername,
             @RequestParam double amount
     ) {
         try {
             String senderUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
             Wallet updatedSenderWallet = walletService.transferToUser(senderUsername, toUsername, amount);
-            return ResponseEntity.ok(updatedSenderWallet);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Transfer successful", updatedSenderWallet)
+            );
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("bad_request", e.getMessage()));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            return ResponseEntity.status(400)
+                    .body(ApiResponse.error("bad_request", e.getMessage()));
         }
     }
 
     @Operation(summary = "Withdraw money from wallet")
     @PostMapping("/withdraw")
-    public ResponseEntity<?> withdraw(
+    public ResponseEntity<ApiResponse<?>> withdraw(
             @RequestParam double amount
     ) {
         try {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
             Wallet updatedWallet = walletService.withdraw(username, amount);
-            return ResponseEntity.ok(updatedWallet);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Withdrawal successful", updatedWallet)
+            );
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("bad_request", e.getMessage()));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.error("not_found", e.getMessage()));
         }
     }
 
