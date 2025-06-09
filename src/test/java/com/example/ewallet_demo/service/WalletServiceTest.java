@@ -1,5 +1,6 @@
 package com.example.ewallet_demo.service;
 
+import com.example.ewallet_demo.model.Transaction;
 import com.example.ewallet_demo.model.User;
 import com.example.ewallet_demo.model.Wallet;
 import com.example.ewallet_demo.repository.TransactionRepository;
@@ -87,11 +88,10 @@ public class WalletServiceTest {
           when(walletRepository.findByUser(sender)).thenReturn(Optional.of(senderWallet));
           when(walletRepository.findByUser(receiver)).thenReturn(Optional.of(receiverWallet));
 
-          Wallet result = walletService.transferToUser("alice", "bob", 30.0);
+          Transaction result = walletService.transferToUser("alice", "bob", 30.0);
 
           assertEquals(70.0, senderWallet.getBalance());
           assertEquals(80.0, receiverWallet.getBalance());
-          assertEquals(70.0, result.getBalance());
      }
 
      @Test
