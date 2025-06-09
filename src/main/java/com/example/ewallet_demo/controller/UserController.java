@@ -43,18 +43,18 @@ public class UserController {
 //            return ResponseEntity.badRequest().body(null);
 //        }
 //    }
-    @Operation(summary = "Login user without auth")
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(
-            @RequestParam String username,
-            @RequestParam String password
-    ) {
-        try {
-            User user = userService.loginUser(username, password);
-            String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
-            return ResponseEntity.ok().body("Bearer " + token);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(401).body(e.getMessage());
-        }
-    }
+//    @Operation(summary = "Login user without auth")
+//    @PostMapping("/login")
+//    public ResponseEntity<?> loginUser(
+//            @RequestParam String username,
+//            @RequestParam String password
+//    ) {
+//        try {
+//            User user = userService.loginUser(username, password);
+//            String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+//            return ResponseEntity.ok().body("Bearer " + token);
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(401).body(e.getMessage());
+//        }
+//    }
 }

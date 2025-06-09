@@ -110,9 +110,10 @@ public class WalletController {
     ) {
         try {
             String senderUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-            Wallet updatedSenderWallet = walletService.transferToUser(senderUsername, toUsername, amount);
+            Transaction transaction = walletService.transferToUser(senderUsername, toUsername, amount);
+            TransactionResponse response = transactionMapper.toResponse(transaction);
             return ResponseEntity.ok(
-                    ApiResponse.success("Transfer successful", updatedSenderWallet)
+                    ApiResponse.success("Transfer successful", response)
             );
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()

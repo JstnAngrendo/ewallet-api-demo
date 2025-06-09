@@ -30,10 +30,12 @@ public class TransactionMapper {
     public TransactionResponse toResponse(Transaction transaction) {
         return TransactionResponse.builder()
                 .id(transaction.getId())
-                .type(transaction.getType())
+                .type(transaction.getType().toString())
                 .amount(transaction.getAmount())
-                .senderUsername(transaction.getSenderUsername())
-                .receiverUsername(transaction.getReceiverUsername())
+                .senderUsername(transaction.getSender().getUsername())
+                .receiverUsername(transaction.getReceiver().getUsername())
+                .description(transaction.getDescription())
+                .status(transaction.getStatus().toString())
                 .timestamp(transaction.getTimestamp())
                 .build();
     }

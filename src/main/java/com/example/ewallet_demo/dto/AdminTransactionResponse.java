@@ -1,12 +1,14 @@
 package com.example.ewallet_demo.dto;
 
+import com.example.ewallet_demo.enums.TransactionType;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class TransactionResponse {
+public class AdminTransactionResponse {
     private Long id;
     private String type;
     private Double amount;

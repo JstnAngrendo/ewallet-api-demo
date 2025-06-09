@@ -1,6 +1,7 @@
 package com.example.ewallet_demo.dto;
 
 
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,4 +12,5 @@ public class UserResponse {
     private String username;
     private String role;
     private boolean active;
+    private LocalDateTime createdAt;
 }

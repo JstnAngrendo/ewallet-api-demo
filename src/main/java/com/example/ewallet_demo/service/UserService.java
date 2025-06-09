@@ -89,6 +89,7 @@ public UserResponse registerUser(UserRegisterRequest request) {
                 .username(user.getUsername())
                 .role(user.getRole())
                 .active(user.isActive())
+                .createdAt(user.getCreatedAt())
                 .build();
     }
 
