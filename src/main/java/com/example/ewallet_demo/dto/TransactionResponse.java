@@ -12,5 +12,7 @@ public class TransactionResponse {
     private Double amount;
     private String senderUsername;
     private String receiverUsername;
+    private String description;
+    private String status;
     private LocalDateTime timestamp;
 }

@@ -1,6 +1,8 @@
 package com.example.ewallet_demo.service;
 
 
+import com.example.ewallet_demo.enums.TransactionStatus;
+import com.example.ewallet_demo.enums.TransactionType;
 import com.example.ewallet_demo.model.Transaction;
 import com.example.ewallet_demo.model.User;
 import com.example.ewallet_demo.model.Wallet;
@@ -34,18 +36,19 @@ public class WalletService {
 
         transactionRepository.save(
                 Transaction.builder()
-                        .type("TOPUP")
+                        .type(TransactionType.TOPUP)
                         .amount(amount)
-                        .senderUsername(username)
-                        .receiverUsername(username)
-                        .timestamp(LocalDateTime.now())
+                        .sender(user)
+                        .receiver(user)
+                        .description("Top-up wallet")
+                        .status(TransactionStatus.COMPLETED)
                         .build()
         );
         return walletRepository.save(wallet);
     }
 
     @Transactional
-    public Wallet transferToUser(String senderUsername, String receiverUsername, double amount) {
+    public Transaction transferToUser(String senderUsername, String receiverUsername, double amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than 0");
         }
@@ -72,17 +75,17 @@ public class WalletService {
         walletRepository.save(senderWallet);
         walletRepository.save(receiverWallet);
 
-        transactionRepository.save(
+        Transaction transaction = transactionRepository.save(
                 Transaction.builder()
-                        .type("TRANSFER")
+                        .type(TransactionType.TRANSFER)
                         .amount(amount)
-                        .senderUsername(senderUsername)
-                        .receiverUsername(receiverUsername)
-                        .timestamp(LocalDateTime.now())
+                        .sender(sender)
+                        .receiver(receiver)
+                        .description("Transfer to " + receiverUsername)
                         .build()
         );
 
-        return senderWallet;
+        return transaction;
     }
 
     @Transactional
@@ -106,10 +109,11 @@ public class WalletService {
 
         transactionRepository.save(
                 Transaction.builder()
-                        .type("WITHDRAW")
+                        .type(TransactionType.WITHDRAWAL)
                         .amount(amount)
-                        .senderUsername(username)
-                        .receiverUsername(username)
+                        .sender(user)
+                        .receiver(user)
+                        .description("Withdrawal from wallet")
                         .timestamp(LocalDateTime.now())
                         .build()
         );

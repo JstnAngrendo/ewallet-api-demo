@@ -1,11 +1,11 @@
 package com.example.ewallet_demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.ewallet_demo.enums.TransactionStatus;
+import com.example.ewallet_demo.enums.TransactionType;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Getter
@@ -18,9 +18,30 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TransactionType type;
+
+    @Column(nullable = false)
     private Double amount;
-    private String senderUsername;
-    private String receiverUsername;
+
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private User sender;
+
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
+
+    @Column
+    private String description;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime timestamp;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private TransactionStatus status = TransactionStatus.COMPLETED;
 }
