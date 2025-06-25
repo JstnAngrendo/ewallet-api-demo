@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>ewallet-demo</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2-june2025</version>
 	<name>ewallet-demo</name>
 	<description>Demo project for E-Wallet</description>
 	<url/>
