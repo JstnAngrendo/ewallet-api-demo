@@ -12,7 +12,13 @@ services:
       - "5432:5432"
     networks:
       - mynetwork
-
+  redis:
+    image: redis:6-alpine
+    container_name: redis_server
+    ports:
+      - "6379:6379"
+    networks:
+      - mynetwork
   app:
     build: .
     container_name: spring_app
@@ -20,8 +26,11 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
     depends_on:
       - db
+      - redis
     ports:
       - "8080:8080"
     networks:
