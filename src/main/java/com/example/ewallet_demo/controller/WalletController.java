@@ -18,6 +18,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,27 +44,22 @@ public class WalletController {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
     private final TransactionService transactionService;
+    private static final Logger log = LoggerFactory.getLogger(WalletService.class);
 
     @Operation(summary = "Get my wallet")
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<?>> getMyWallet( ) {
-//        String token = authHeader.substring(7);
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<User> userOpt = userRepository.findByUsername(username);
+        log.info("Current logged-in username: {}", username);
 
-        if (userOpt.isEmpty()) {
+        try {
+            WalletResponse walletResponse = walletService.getMyWallet(username);
+            log.info("Returning wallet response: {}", walletResponse);
+            return ResponseEntity.ok(ApiResponse.success("Wallet retrieved successfully", walletResponse));
+        } catch (RuntimeException e) {
             return ResponseEntity.status(404)
-                    .body(ApiResponse.error("not_found", "User not found"));
+                    .body(ApiResponse.error("not_found", e.getMessage()));
         }
-
-        Optional<Wallet> walletOpt = walletRepository.findByUser(userOpt.get());
-        if (walletOpt.isEmpty()) {
-            return ResponseEntity.status(404)
-                    .body(ApiResponse.error("not_found", "Wallet not found"));
-        }
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Wallet retrieved successfully", walletOpt.get()));
     }
 
 //    @PostMapping("/topup")

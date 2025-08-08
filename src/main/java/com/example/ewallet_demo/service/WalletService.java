@@ -1,6 +1,7 @@
 package com.example.ewallet_demo.service;
 
 
+import com.example.ewallet_demo.dto.WalletResponse;
 import com.example.ewallet_demo.enums.TransactionStatus;
 import com.example.ewallet_demo.enums.TransactionType;
 import com.example.ewallet_demo.model.Transaction;
@@ -10,8 +11,12 @@ import com.example.ewallet_demo.repository.TransactionRepository;
 import com.example.ewallet_demo.repository.UserRepository;
 import com.example.ewallet_demo.repository.WalletRepository;
 import jakarta.transaction.Transactional;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +25,35 @@ public class WalletService {
     private final WalletRepository walletRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final Logger log = LoggerFactory.getLogger(WalletService.class);
+
+
+    public WalletResponse getMyWallet(String username) {
+        String cacheKey = "wallet:" + username;
+
+        WalletResponse cached = (WalletResponse) redisTemplate.opsForValue().get(cacheKey);
+        if (cached != null) {
+            log.info("Cache hit for key: {}", cacheKey);
+            return cached;
+        }
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Wallet wallet = walletRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+        WalletResponse response = WalletResponse.builder()
+                .id(wallet.getId())
+                .username(user.getUsername())
+                .balance(wallet.getBalance())
+                .build();
+
+        redisTemplate.opsForValue().set(cacheKey, response, Duration.ofMinutes(5));
+        log.info("Wallet cached for key: {}", cacheKey);
+
+        return response;
+    }
 
     public Wallet topUp(String username, double amount) {
         if (amount <= 0) {
@@ -44,6 +78,9 @@ public class WalletService {
                         .status(TransactionStatus.COMPLETED)
                         .build()
         );
+        redisTemplate.delete("wallet:" + username);
+        log.info("Cache invalidated for key: wallet:{}", username);
+
         return walletRepository.save(wallet);
     }
 
@@ -84,6 +121,9 @@ public class WalletService {
                         .description("Transfer to " + receiverUsername)
                         .build()
         );
+        redisTemplate.delete("wallet:" + senderUsername);
+        redisTemplate.delete("wallet:" + receiverUsername);
+        log.info("Cache invalidated for key: wallet:{} and wallet:{}", senderUsername, receiverUsername);
 
         return transaction;
     }
@@ -117,8 +157,17 @@ public class WalletService {
                         .timestamp(LocalDateTime.now())
                         .build()
         );
+        redisTemplate.delete("wallet:" + username);
+        log.info("Cache invalidated for key: wallet:{}", username);
 
         return wallet;
     }
 
+    public WalletResponse toWalletResponse(Wallet wallet) {
+        return WalletResponse.builder()
+                .id(wallet.getId())
+                .username(wallet.getUser().getUsername())
+                .balance(wallet.getBalance())
+                .build();
+    }
 }

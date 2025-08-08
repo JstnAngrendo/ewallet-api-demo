@@ -9,21 +9,25 @@ import com.example.ewallet_demo.repository.WalletRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.redis.core.RedisTemplate;
+
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WalletServiceTest {
      private WalletRepository walletRepository;
      private UserRepository userRepository;
-     private WalletService walletService;
      private TransactionRepository transactionRepository;
+     private RedisTemplate<String, Object> redisTemplate;
+     private WalletService walletService;
 
      @BeforeEach
      void setUp() {
           walletRepository = mock(WalletRepository.class);
           userRepository = mock(UserRepository.class);
           transactionRepository = mock(TransactionRepository.class);
-          walletService = new WalletService(walletRepository, userRepository, transactionRepository);
+          redisTemplate = mock(RedisTemplate.class);
+          walletService = new WalletService(walletRepository, userRepository, transactionRepository, redisTemplate);
      }
 
      @Test
