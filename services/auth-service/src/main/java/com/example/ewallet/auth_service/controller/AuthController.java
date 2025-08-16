@@ -27,8 +27,8 @@ public class AuthController {
     @Operation(summary = "Login user with auth - receiving Bearer token")
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<?>> login(@Valid @RequestBody LoginRequest loginRequest) {
-        User user = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
+        User authenticatedUser = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+        String token = jwtUtil.generateToken(authenticatedUser.getId(), authenticatedUser.getUsername(), authenticatedUser.getRole().name());
         TokenResponse tokenResponse = new TokenResponse(token, "Bearer", jwtUtil.getExpirationInSeconds());
 
         return ResponseEntity.ok()

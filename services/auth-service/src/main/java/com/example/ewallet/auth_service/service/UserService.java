@@ -3,6 +3,7 @@ package com.example.ewallet.auth_service.service;
 
 
 import com.example.ewallet.auth_service.dto.UserRegisterRequest;
+import com.example.ewallet.auth_service.dto.UserRegisteredEvent;
 import com.example.ewallet.auth_service.dto.UserResponse;
 import com.example.ewallet.auth_service.enums.Role;
 import com.example.ewallet.auth_service.exception.UserNotFoundException;
@@ -15,18 +16,28 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.kafka.core.KafkaTemplate;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final KafkaTemplate<String, UserRegisteredEvent> kafkaTemplate;
     @Transactional
     public UserResponse registerUser(UserRegisterRequest request) {
         validateUsername(request.getUsername());
 
         User newUser = createUser(request);
         User savedUser = userRepository.saveAndFlush(newUser);
+
+        UserRegisteredEvent event = UserRegisteredEvent.builder()
+                .userId(savedUser.getId())
+                .username(savedUser.getUsername())
+                .build();
+
+        kafkaTemplate.send("user-registered", event);
+
         return toUserResponse(savedUser);
     }
 

@@ -2,25 +2,44 @@ package com.example.ewallet.auth_service.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.UUID;
 import java.util.function.Function;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 @Component
 public class JwtUtil {
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+    @Value("${jwt.secret}")
+    private String secretKeyString;
+
+    private Key key;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8));
+    }
     private final long EXPIRATION_TIME = 86400000;
 
-    public String generateToken(String username, String role) {
+    public String generateToken(UUID userId, String username, String role) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userId.toString())
+                .claim("username", username)
                 .claim("roles", "ROLE_" + role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key)
                 .compact();
+    }
+
+    public UUID extractUserId(String token) {
+        return UUID.fromString(extractAllClaims(token).getSubject());
     }
 
     public String extractRole(String token) {
@@ -65,9 +84,8 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
+        return (String) extractAllClaims(token).get("username");
     }
-
 
     public boolean isTokenValid(String token, String username) {
         final String extractedUsername = extractUsername(token);
