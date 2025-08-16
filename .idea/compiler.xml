@@ -3,13 +3,14 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for ewallet-microservices-parent" enabled="true">
+      <profile name="Annotation profile for wallet-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath>
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
+        <module name="wallet-service" />
         <module name="auth-service" />
       </profile>
     </annotationProcessing>
@@ -21,6 +22,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="auth-service" options="-parameters" />
       <module name="ewallet-demo" options="-parameters" />
+      <module name="wallet-service" options="-parameters" />
     </option>
   </component>
 </project>
